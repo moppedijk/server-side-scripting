@@ -1,0 +1,27 @@
+//- Include header
+include ../_includes/header.jade
+
+//- Wrapper
+.wrapper
+
+	//- Header
+	header#header.header
+		block header
+			if headerTitle
+				h1!= headerTitle
+			else
+				h1!= 'No headerTitle specified'
+
+			if menuItems
+				ul
+					each menuItem in menuItems
+						li: a(href=menuItem.hash)= menuItem.title
+			else
+				p!= 'No menuItems specified'
+
+	//- Content
+	section#content.content
+		block content
+
+//- Include footer
+include ../_includes/footer.jade

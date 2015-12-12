@@ -1,0 +1,15 @@
+extends _layout/default.jade
+
+block content
+	h1!= 'Cars'
+	ul
+		each car in cars
+			li
+				= car.brand
+	
+	div.cars
+		- for (var i = 0; i < cars.length; i++)
+			p!= cars[i].model
+	
+	script.
+		console.log("Test");

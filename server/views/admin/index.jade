@@ -1,0 +1,13 @@
+extends ../_layout/default.jade
+
+block content
+	p!= 'This is the admin page!'
+	div.form
+		.form__message#message
+			p!= 'Please login to view the admin pages'
+		.form__input
+			input(type='text' placeholder='Username' name='username' id='username')
+		.form__input
+			input(type='password' placeholder='password' name='password' id='password')
+		.form__button
+			button#btnSubmit Login

@@ -1,0 +1,26 @@
+{
+  "name": "wg2_express",
+  "version": "1.0.0",
+  "description": "Werkgroep 2 express server example",
+  "main": "app.js",
+  "scripts": {
+    "test": "run-app"
+  },
+  "keywords": [
+    "wg2",
+    "server",
+    "side",
+    "scripting",
+    "hva",
+    "cmd"
+  ],
+  "author": "Martijn Oppedijk",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.14.1",
+    "express": "^4.13.3",
+    "express-session": "^1.12.1",
+    "jade": "^1.11.0",
+    "mysql": "^2.9.0"
+  }
+}
