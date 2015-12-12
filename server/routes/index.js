@@ -1,19 +1,30 @@
-// Inheritance of an abstract router
+var abstractRouter = require('./_abstractRouter');
+var extend = require('extend');
 
-var express = require('express');
-var app = express();
-var router = express.Router();
+var indexRouter = extend(abstractRouter, {
+	initRouter: function() {
 
-router.get('/', function (req, res, next){
-	res.render('index', {
-		title: 'Index',
-		headerTitle: 'This is the index',
-		menuItems: [
-			{title: 'Home', hash: '/'}, 
-			{title: 'Auto\'s', hash: 'cars'},
-		]
-	});
+		this.router.get('/', function (req, res, next){
+			res.render('index', this.data());
+		}.bind(this));
+
+		// A module always needs to export
+		module.exports = this.router;
+	},
+	data: function() {
+
+		var data = {
+			title: 'Index',
+			headerTitle: 'This is the index',
+			menuItems: [
+				{title: 'Home', hash: '/'}, 
+				{title: 'Auto\'s', hash: 'cars'},
+			]
+		}
+
+		return data;
+	}
 });
 
-// A module always needs to export something
-module.exports = router;
+// Initialze init in abstract router
+indexRouter.init();
