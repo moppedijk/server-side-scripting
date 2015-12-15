@@ -12,6 +12,9 @@ var adminRouter = extend(abstractRouter, {
 		this.auth = function (req, res, next) {
 			// Authentication and Authorization Middleware
 			
+			// // if (req.session && req.session.user === this.credentials.username && this.req.session.admin) {
+			// // Session is false! But why?
+
 		  	if (req.session.user === this.credentials.username) {
 		  		return next();
 		  	} else {
