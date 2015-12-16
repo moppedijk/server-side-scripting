@@ -2,25 +2,9 @@ var abstractRouter = {
 	init:function() {
 		this.express = require('express');
 		this.router = this.express.Router();
+		this.MongoClient = require('mongodb').MongoClient;
 
-		var MongoClient = require('mongodb').MongoClient;
-
-		MongoClient.connect('mongodb://localhost:27017/animals', function(err, db) {
-			
-			if (err) {
-				throw err;
-			}
-
-			db.collection('mammals').find().toArray(function(err, result) {
-			
-			if (err) {
-			  	throw err;
-			}
-				console.log(result);
-			});
-			
-		});
-
+		// Call initRouter in child object
 		this.initRouter();
 	}
 }

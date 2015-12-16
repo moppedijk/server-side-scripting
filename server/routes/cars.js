@@ -6,20 +6,20 @@ var carsRouter = extend(abstractRouter, {
 	initRouter: function() {
 
 		this.router.get('/', function (req, res, next){
-			res.render('cars', this.data());
+			res.render('cars', this.getCarsData());
 		}.bind(this));
 
 		// A module always needs to export something
 		module.exports = this.router;
 	},
-	data: function() {
+	getCarsData: function() {
 
 		var data = {
-				title: 'Cars', 
-				headerTitle: 'This is the cars page',
+				title: 'SSS | Cars', 
+				headerTitle: 'SSS',
 				menuItems: [
 					{title: 'Home', hash: '/'}, 
-					{title: 'Auto\'s', hash: 'cars'},
+					{title: 'Auto\'s', hash: 'cars', active: true},
 				],
 				cars: [
 					{

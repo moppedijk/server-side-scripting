@@ -1,4 +1,11 @@
 extends _layout/default.jade
 
 block content
-	p!= 'This is the index page and this page has no functionalites, look at our cars please!'
+	.row
+		.jumbotron
+			h1.display-3!= 'Hello, you!'
+			p.lead!= 'This is the index page and this page has no functionalites, look at our cars please!'
+			hr.m-y-2
+			p!= 'Or if you have the power, please try to add more cars to our showroom'
+			p.lead
+				a.btn.btn-primary.btn-lg(href="/admin" role="button")= 'Login'

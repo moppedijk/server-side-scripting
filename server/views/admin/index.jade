@@ -1,13 +1,20 @@
 extends ../_layout/default.jade
 
 block content
-	p!= 'This is the admin page!'
-	div.form
-		.form__message#message
-			p!= 'Please login to view the admin pages'
-		.form__input
-			input(type='text' placeholder='Username' name='username' id='username')
-		.form__input
-			input(type='password' placeholder='password' name='password' id='password')
-		.form__button
-			button#btnSubmit Login
+	.row
+		.col-md-5.col-md-offset-4
+			.alert(role="alert")#message!= 'Please login to view the admin pages'
+	.row
+		.col-md-6.col-md-offset-3
+			.form
+				.form-group.row
+					label.col-sm-2.form-control-label(for="username")!= 'Email'
+					.col-sm-10
+						input.form-control(type='text' placeholder='Username' name='username' id='username')
+				.form-group.row
+					label.col-sm-2.form-control-label(for="password")!= 'Password'
+					.col-sm-10
+						input.form-control(type='password' placeholder='password' name='password' id='password')
+				.form-group.row
+					.col-sm-offset-2.col-sm-10
+						button.btn.btn-secondary#btnSubmit Login

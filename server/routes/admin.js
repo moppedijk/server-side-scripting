@@ -4,6 +4,15 @@ var extend = require('extend');
 var adminRouter = extend(abstractRouter, {
 	initRouter: function() {
 
+		this.MongoClient.connect('mongodb://localhost:27017/serverSideScripting', function(err, db) {
+		  	if (err) {
+		  		console.log("mongodb not runnning...");
+		    	throw err;
+		  	} else {
+		  		console.log("mongodb runnning...");
+		  	}
+		});
+
 		this.credentials = {
 			username:'admin',
 			password: '1234'
@@ -11,11 +20,9 @@ var adminRouter = extend(abstractRouter, {
 
 		this.auth = function (req, res, next) {
 			// Authentication and Authorization Middleware
-			
-			// // if (req.session && req.session.user === this.credentials.username && this.req.session.admin) {
-			// // Session is false! But why?
 
-		  	if (req.session.user === this.credentials.username) {
+			// Authenticate with user id
+		  	if (req.session.admin && req.session.user === this.credentials.username) {
 		  		return next();
 		  	} else {
 		  		return res.sendStatus(401);
@@ -27,7 +34,7 @@ var adminRouter = extend(abstractRouter, {
 		this.router.get('/', function (req, res, next){
 			res.render('admin/index', {
 				title: 'Admin',
-				headerTitle: 'Please login for the admin panel',
+				headerTitle: 'SSS - Admin',
 				menuItems: [
 					{title: 'Home', hash: '/'}, 
 					{title: 'Auto\'s', hash: 'cars'},
@@ -40,6 +47,7 @@ var adminRouter = extend(abstractRouter, {
 		  	if (!req.body.username || !req.body.password) {
 		    	res.send('login failed');
 		  	} else if(req.body.username === this.credentials.username || req.body.password === this.credentials.password) {
+		  		// Authenticate with user id
 			    req.session.user = this.credentials.username;
 			    req.session.admin = true;
 			    res.send("login success!");

@@ -11,16 +11,13 @@
 			// Initialize
 			$('#btnSubmit').click(function(){
 				if(!this.onBtnSubmitClick())
-					alert("Please fillin the form!");
+					$('#message').html("Please fillin the form!").removeClass('alert-success').addClass('alert-warning');
 			}.bind(this));
-
-			console.log(this.baseUrl());
 		},
 		onBtnSubmitClick:function() {
 			var username = $('#username').val(),
 				password = $('#password').val(),
 				postUrl = this.getBaseUrl() + '/admin/login';
-
 
 			if(!username || !password) {
 				return false;
@@ -33,7 +30,7 @@
 				  		password: password
 				  	}
 				}).done(function( msg ) {
-				    $('#message').html( msg );
+				    $('#message').html(msg).removeClass('alert-warning').addClass('alert-success');
 				});
 
 				return true;

@@ -1,15 +1,15 @@
 extends _layout/default.jade
 
 block content
-	h1!= 'Cars'
-	ul
+	.row
 		each car in cars
-			li
-				= car.brand
-	
-	div.cars
-		- for (var i = 0; i < cars.length; i++)
-			p!= cars[i].model
-	
-	script.
-		console.log("Test");
+			.col-md-4
+				.card
+					.card-block
+						h4.card-title!= 'Card title'
+						h6.card-subtitle.text-muted!= 'Support card subtitle'
+					img(data-src='...' alt='Card image')
+					.card-block
+						p.card-text!= 'Some quick example text to build on the card title and make up the bulk of the card\'s content.'
+						a.card-link(href="#")!= 'Card link'
+						a.card-link(href="#")!= 'Another link'
