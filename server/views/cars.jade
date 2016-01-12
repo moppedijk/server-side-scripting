@@ -2,14 +2,18 @@ extends _layout/default.jade
 
 block content
 	.row
-		each car in cars
+		if cars.length > 0
+			each car in cars
+				.col-md-4
+					.card
+						.card-block
+							h4.card-title!= car.name
+							h6.card-subtitle.text-muted!= car.price
+						img(data-src='...' alt='Card image')
+						.card-block
+							p.card-text!= car.color
+							a.card-link(href="#")!= 'Card link'
+							a.card-link(href="#")!= 'Another link'
+		else
 			.col-md-4
-				.card
-					.card-block
-						h4.card-title!= 'Card title'
-						h6.card-subtitle.text-muted!= 'Support card subtitle'
-					img(data-src='...' alt='Card image')
-					.card-block
-						p.card-text!= 'Some quick example text to build on the card title and make up the bulk of the card\'s content.'
-						a.card-link(href="#")!= 'Card link'
-						a.card-link(href="#")!= 'Another link'
+				p!= 'No cars!'
