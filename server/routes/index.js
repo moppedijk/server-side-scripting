@@ -1,30 +1,55 @@
-var abstractRouter = require('./_abstractRouter');
-var extend = require('extend');
+/*
+ *	ROUTER VARIABLES
+ */
 
-var indexRouter = extend(abstractRouter, {
-	initRouter: function() {
+var config = require('../config'),
+	express = require('express'),
+	router = express.Router(),
+	MongoClient = require('mongodb').MongoClient,
+ 	connectionString = 'mongodb://';
+	connectionString += config.database.host;
+	connectionString += ':';
+	connectionString += config.database.port;
+	connectionString += '/';
+	connectionString += config.database.name;
 
-		this.router.get('/', function (req, res, next){
-			res.render('index', this.getIndexData());
-		}.bind(this));
+/*
+ *	ROUTER DEFINITIONS
+ */
 
-		// A module always needs to export
-		module.exports = this.router;
-	},
-	getIndexData: function() {
-
-		var data = {
-			title: 'SSS | Index',
-			headerTitle: 'SSS',
-			menuItems: [
-				{title: 'Home', hash: '/', active: true}, 
-				{title: 'Auto\'s', hash: 'cars'},
-			]
+// Default router
+router.get('/', function (req, res, next){
+	
+	MongoClient.connect(connectionString, function(err, db) {
+		if (err) {
+			throw err;
+		} else {
+			db.collection('cars').find().toArray(function(err, result) {
+				if (err) {
+					throw err;
+				} else {
+					res.render('index', {
+						title: 'SSS | Index',
+						headerTitle: 'SSS',
+						menuItems: [
+							{title: 'Home', hash: '/', active: true}, 
+							{title: 'Auto\'s', hash: 'cars'},
+						],
+						cars: result
+					});
+				}
+			});
 		}
-
-		return data;
-	}
+	});
 });
 
-// Initialze init in abstract router
-indexRouter.init();
+router.get('/:id', function (req, res, next) {
+	console.log('Detail');
+});
+		
+/*
+ *	CUSTOM FUNCTIONS
+ */
+
+// A module always needs to export
+module.exports = router;

@@ -6,7 +6,7 @@ block content
 			.alert(role="alert")#message!= 'Please login to view the admin pages'
 	.row
 		.col-md-6.col-md-offset-3
-			.form
+			form.form(method="POST" action="/admin/login")
 				.form-group.row
 					label.col-sm-2.form-control-label(for="username")!= 'Email'
 					.col-sm-10

@@ -9,10 +9,10 @@
 		},
 		init:function() {
 			// Initialize
-			$('#btnSubmit').click(function(){
-				if(!this.onBtnSubmitClick())
-					$('#message').html("Please fillin the form!").removeClass('alert-success').addClass('alert-warning');
-			}.bind(this));
+			// $('#btnSubmit').click(function(){
+			// 	if(!this.onBtnSubmitClick())
+			// 		$('#message').html("Please fillin the form!").removeClass('alert-success').addClass('alert-warning');
+			// }.bind(this));
 		},
 		onBtnSubmitClick:function() {
 			var username = $('#username').val(),

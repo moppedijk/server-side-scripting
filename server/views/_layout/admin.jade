@@ -1,0 +1,23 @@
+//- Include header
+include ../_includes/header.jade
+
+//- Header
+header#header.header
+	nav.navbar.navbar-light.bg-faded
+		a.navbar-brand(href="/")!= 'Back to home'
+		.pull-xs-right
+			a.btn.btn-success-outline(href='/admin/logout')!= 'Logout'
+
+//- Content
+section#content.container
+	.row
+		.col-md-2
+			div.list-group
+				a.list-group-item.active(href="/admin/dashboard")!= 'Dashboard'
+				a.list-group-item(href="/admin/users")!= 'Users'
+
+		.col-md-10
+			block content
+
+//- Include footer
+include ../_includes/footer.jade

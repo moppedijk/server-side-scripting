@@ -2,10 +2,13 @@ extends _layout/default.jade
 
 block content
 	.row
-		.jumbotron
-			h1.display-3!= 'Hello, you!'
-			p.lead!= 'This is the index page and this page has no functionalites, look at our cars please!'
-			hr.m-y-2
-			p!= 'Or if you have the power, please try to add more cars to our showroom'
-			p.lead
-				a.btn.btn-primary.btn-lg(href="/admin" role="button")= 'Login'
+		each car in cars
+			.col-md-4
+				.card
+					.card-block
+						h4.card-title!= car.name
+						h6.card-subtitle.text-muted!= car.price
+					img(src='http://lorempixel.com/350/200/transport/' alt!= car.name)
+					.card-block
+						p.card-text!= car.color
+						a.card-link(href!= car._id)!= 'Detail'
