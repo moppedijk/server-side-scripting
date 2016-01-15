@@ -7,9 +7,11 @@ var config = require('../config'),
     express = require('express'),
     router = express.Router(),
     multer = require('multer'),
+    im = require('imagemagick'),
+    path = require('path'),
     credentials = {
-        username:'admin',
-        password: '1234'
+    username:'admin',
+    password: '1234'
     },
     MongoClient = require('mongodb').MongoClient,
     MongoClient = require('mongodb').MongoClient,
@@ -30,14 +32,14 @@ var upload = multer({dest: 'public/uploads/'});
  *	https://orchestrate.io/blog/2014/06/26/build-user-authentication-with-node-js-express-passport-and-orchestrate/
  */
 
-var auth = function (req, res, next) {
+ var auth = function (req, res, next) {
 	// Authentication and Authorization Middleware
 	// Authenticate with user id
-  	if (req.session.admin && req.session.user === credentials.username) {
-  		return next();
-  	} else {
-  		return res.redirect('/admin/');
-  	}
+ if (req.session.admin && req.session.user === credentials.username) {
+    return next();
+} else {
+    return res.redirect('/admin/');
+}
 };
 
 /*
@@ -51,9 +53,9 @@ router.get('/', function (req, res, next){
         res.redirect('admin/dashboard');
     } else {
         res.render('admin/index', {
-        title: 'Admin',
-        headerTitle: 'SSS - Admin',
-        menuItems: [
+            title: 'Admin',
+            headerTitle: 'SSS - Admin',
+            menuItems: [
             {title: 'Home', hash: '/'}, 
             {title: 'Auto\'s', hash: 'cars'},
             ]
@@ -63,20 +65,20 @@ router.get('/', function (req, res, next){
 
 // Login endpoint
 router.post('/login', function (req, res) {
-  	if (!req.body.username || !req.body.password) {
-    	res.redirect("admin");
-  	} else if(req.body.username === credentials.username || req.body.password === credentials.password) {
+ if (!req.body.username || !req.body.password) {
+   res.redirect("admin");
+} else if(req.body.username === credentials.username || req.body.password === credentials.password) {
   		// Authenticate with user id
-	    req.session.user = credentials.username;
-	    req.session.admin = true;
-        res.redirect("dashboard");
-  	}
+       req.session.user = credentials.username;
+       req.session.admin = true;
+       res.redirect("dashboard");
+   }
 });
 
 // Logout endpoint
 router.get('/logout', function (req, res) {
-  	req.session.destroy();
-  	res.send("logout success!");
+ req.session.destroy();
+ res.send("logout success!");
 });
 
 // Get dashboard
@@ -141,10 +143,39 @@ router.post('/dashboard/add/new', upload.single('image'), auth, function (req, r
         /*
          *  How does this work?
          */
-        fs.rename(req.file.path, req.file.destination + req.file.originalname, function(err){
+        fs.rename(req.file.path, req.file.destination + req.file.originalname, function(err) {
             if(err) {
                 throw err;
             } else {
+
+                console.log(req.file.path); 
+
+                var parsedName = path.parse(req.file.originalname);
+                var imageSmall = parsedName.name + '-small' + parsedName.ext;
+                var imageLarge = parsedName.name + '-large' + parsedName.ext;
+
+                // Small Image
+                im.resize( {
+                    srcPath: req.file.destination + req.file.originalname,
+                    dstPath: req.file.destination + imageSmall,
+                    width: 350,
+                    height: 350, 
+                }, function(err, stdout, stderr) {
+                    if (err) throw err;
+                });
+
+                // large image
+                im.resize( {
+                    srcPath: req.file.destination + req.file.originalname,
+                    dstPath: req.file.destination + imageLarge,
+                    width: 760
+                }, function(err, stdout, stderr) {
+                    if (err) throw err;
+                    
+                });
+
+                data.imageSmall = imageSmall;
+                data.imageLarge = imageLarge;
                 data.image = req.file.originalname;
             }
         });
@@ -153,6 +184,7 @@ router.post('/dashboard/add/new', upload.single('image'), auth, function (req, r
             if (err) {
                 throw err;
             } else {
+
                 db.collection('cars').insertOne(data, function(err, result){
                     if(err) {
                         throw err;
@@ -177,12 +209,32 @@ router.get('/dashboard/delete/:id', auth, function (req, res, next) {
         if (err) {
             throw err;
         } else {
-            db.collection('cars').removeOne({"_id": o_id}, function(err, result){
-                if(err) {
+
+            // Get cars document
+            db.collection('cars').find({"_id" : o_id }).toArray(function(err, result) {
+                if (err) {
                     throw err;
                 } else {
-                    var message = 'Car with id: ' + id + ' deleted!'; 
-                    res.redirect('/admin/dashboard/?message=' + message);
+                    var uploadDir = 'public/uploads/';
+                    // inlink image
+                    if(result[0].image)
+                        deleteImage(uploadDir + result[0].image);
+                    // unlink small image
+                    if(result[0].imageSmall)
+                        deleteImage(uploadDir + result[0].imageSmall);
+                    // unlink large image
+                    if(result[0].imageLarge)
+                        deleteImage(uploadDir + result[0].imageLarge);
+
+                    // remove document
+                    db.collection('cars').removeOne({"_id": o_id}, function(err, result){
+                        if(err) {
+                            throw err;
+                        } else {
+                            var message = 'Car with id: ' + id + ' deleted!'; 
+                            res.redirect('/admin/dashboard/?message=' + message);
+                        }
+                    });
                 }
             });
         }
@@ -192,6 +244,16 @@ router.get('/dashboard/delete/:id', auth, function (req, res, next) {
 /*
  *	FUNCTION DEFINITIONS
  */
+
+// remove image
+function deleteImage (imageUrl) {
+    
+    console.log(imageUrl);
+
+    fs.unlink(imageUrl, function(err) {
+        if (err) throw err;
+    });
+}
 
 // A module always needs to export something
 module.exports = router;

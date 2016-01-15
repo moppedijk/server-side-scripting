@@ -29,6 +29,8 @@ router.get('/', function (req, res, next) {
 				if (err) {
 					throw err;
 				} else {
+					console.log(result);
+
 					res.render('index/index', {
 						title: 'SSS | Index',
 						headerTitle: 'SSS | Photo\'s',

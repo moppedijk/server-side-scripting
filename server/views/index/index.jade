@@ -9,7 +9,7 @@ block content
 						h4.card-title!= car.name
 						h6.card-subtitle.text-muted!= car.price
 					.card-img
-						img(src!='/uploads/' + car.image)
+						img(src!='/uploads/' + car.imageSmall)
 					.card-block
 						p.card-text!= car.color
 						a.card-link(href!= '/photo/' + car._id)!= 'Detail'
