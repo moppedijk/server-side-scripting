@@ -10,6 +10,10 @@ header#header.header
 
 //- Content
 section#content.container
+	if(message)
+		.row
+			.col-md-12
+				.alert.alert-info!= message
 	.row
 		.col-md-2
 			div.list-group

@@ -1,4 +1,4 @@
-extends _layout/default.jade
+extends ../_layout/default.jade
 
 block content
 	.row
@@ -8,7 +8,8 @@ block content
 					.card-block
 						h4.card-title!= car.name
 						h6.card-subtitle.text-muted!= car.price
-					img(src='http://lorempixel.com/350/200/transport/' alt!= car.name)
+					.card-img
+						img(src!='/uploads/' + car.image)
 					.card-block
 						p.card-text!= car.color
-						a.card-link(href!= car._id)!= 'Detail'
+						a.card-link(href!= '/photo/' + car._id)!= 'Detail'

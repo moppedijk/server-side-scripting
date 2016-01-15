@@ -6,6 +6,7 @@ var config = require('../config'),
 	express = require('express'),
 	router = express.Router(),
 	MongoClient = require('mongodb').MongoClient,
+	MongoObjectId = require('mongodb').ObjectID,
  	connectionString = 'mongodb://';
 	connectionString += config.database.host;
 	connectionString += ':';
@@ -18,7 +19,7 @@ var config = require('../config'),
  */
 
 // Default router
-router.get('/', function (req, res, next){
+router.get('/', function (req, res, next) {
 	
 	MongoClient.connect(connectionString, function(err, db) {
 		if (err) {
@@ -28,13 +29,9 @@ router.get('/', function (req, res, next){
 				if (err) {
 					throw err;
 				} else {
-					res.render('index', {
+					res.render('index/index', {
 						title: 'SSS | Index',
-						headerTitle: 'SSS',
-						menuItems: [
-							{title: 'Home', hash: '/', active: true}, 
-							{title: 'Auto\'s', hash: 'cars'},
-						],
+						headerTitle: 'SSS | Photo\'s',
 						cars: result
 					});
 				}
@@ -43,8 +40,27 @@ router.get('/', function (req, res, next){
 	});
 });
 
-router.get('/:id', function (req, res, next) {
-	console.log('Detail');
+router.get('/photo/:id', function (req, res, next) {
+	var id = req.params.id;
+	var o_id = new MongoObjectId(id);
+
+	MongoClient.connect(connectionString, function(err, db) {
+		if (err) {
+			throw err;
+		} else {
+			db.collection('cars').find({"_id" : o_id }).toArray(function(err, result) {
+				if (err) {
+					throw err;
+				} else {
+					res.render('index/detail', {
+						title: 'SSS | ' + result[0].name,
+						headerTitle: 'Back',
+						cars: result
+					});
+				}
+			});
+		}
+	});
 });
 		
 /*

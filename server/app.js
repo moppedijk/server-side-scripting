@@ -5,7 +5,7 @@
 var config = require('./config'),
     express = require('express'),
     session = require('express-session'),
-    bodyParser = require("body-parser"),
+    bodyParser = require('body-parser'),
     app = express();
 
 // Required routes

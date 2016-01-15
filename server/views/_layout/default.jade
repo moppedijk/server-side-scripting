@@ -4,14 +4,7 @@ include ../_includes/header.jade
 //- Header
 header#header.header
 	nav.navbar.navbar-light.bg-faded
-		a.navbar-brand(href="#")= headerTitle
-		ul.nav.navbar-nav
-			each menuItem in menuItems
-				if menuItem.active 
-					li.nav-item: a.nav-link.active(href=menuItem.hash)= menuItem.title
-				else
-					li.nav-item: a.nav-link(href=menuItem.hash)= menuItem.title
-
+		a.navbar-brand(href="/")= headerTitle
 		.pull-xs-right
 			a.btn.btn-success-outline(href='/admin')!= 'Admin'
 

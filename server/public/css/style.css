@@ -1,3 +1,11 @@
 .header {
 	padding-bottom: 20px;
 }
+
+.card-img {
+	max-height: 300px;
+	overflow: hidden;
+}
+.card-img img {
+	max-width: 100%;
+}

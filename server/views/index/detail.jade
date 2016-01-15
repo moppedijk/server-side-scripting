@@ -1,0 +1,20 @@
+extends ../_layout/default.jade
+
+block content
+	.row
+		each car in cars
+			.col-md-8.col-md-offset-2
+				h4!= car.name
+				h6!= 'Euro: ' + car.price
+				img(src!='/uploads/' + car.image)
+				p!= car.color
+			.col-md-8.col-md-offset-2
+				form
+					fieldset.form-group
+						label(for='email')!= 'E-mail'
+						input.form-control#email(type='text' placeholder='naam@email.com')
+					fieldset.form-group
+						label(for='comment')!= 'Comment'
+						textarea.form-control#comment(rows='5' placeholder='Place your comment here...')
+					button.btn.btn-primary(type='submit')!= 'Add comment!'
+

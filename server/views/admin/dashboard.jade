@@ -1,21 +1,33 @@
 extends ../_layout/admin.jade
 
 block content
-	table.table
-		thead
-			tr
-				th!= '#'
-				th!= 'Image'
-				th!= 'Name'
-				th!= 'Comments'
-				th!= 'Edit'
-		tbody
-			tr
-				th(scope='row')!= '1'
-				td!= 'http://imgurl.local'
-				td!= 'Title of image'
-				td
-					p!= 'View '
-						span.label.label-default!= '1'
-				td
-					a(href='/admin/dashboard/edit/1')!= 'Edit'
+	.row
+		.col-md-12
+			table.table
+				thead
+					tr
+						th!= '#'
+						th!= 'Image'
+						th!= 'Name'
+						th!= 'Price'
+						th!= 'Color'
+						th!= 'Comments'
+						th!= 'Edit'
+				tbody
+					each car in cars
+						tr
+							th(scope='row')!= '#'
+							td!= car.image
+							td!= car.name
+							td!= car.price
+							td!= car.color
+							td
+								p!= 'Comments '
+									span.label.label-default!= '1'
+							td
+								a(href='/admin/dashboard/edit/' + car._id)!= 'Edit'
+								span!= ' | '
+								a(href='/admin/dashboard/delete/' + car._id)!= 'Delete'
+	.row
+		.col-md-12
+			a.btn.btn-primary(href='/admin/dashboard/add/')!= 'Add car'
