@@ -2,14 +2,21 @@ extends ../_layout/default.jade
 
 block content
 	.row
-		each car in cars
+		if cars.length > 0
+			each car in cars
+				.col-md-4
+					.card
+						.card-block
+							h4.card-title!= car.name
+							h6.card-subtitle.text-muted!= car.price
+						.card-img
+							img(src!='/uploads/' + car.imageSmall)
+						.card-block
+							p.card-text!= car.color
+							a.card-link(href!= '/photo/' + car._id)!= 'Detail'
+		else
 			.col-md-4
 				.card
 					.card-block
-						h4.card-title!= car.name
-						h6.card-subtitle.text-muted!= car.price
-					.card-img
-						img(src!='/uploads/' + car.imageSmall)
-					.card-block
-						p.card-text!= car.color
-						a.card-link(href!= '/photo/' + car._id)!= 'Detail'
+						h4.card-title!= 'No cars yet!'
+						p!= 'Please upload some cars!'

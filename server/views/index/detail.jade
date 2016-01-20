@@ -2,19 +2,25 @@ extends ../_layout/default.jade
 
 block content
 	.row
-		each car in cars
-			.col-md-8.col-md-offset-2
-				h4!= car.name
-				h6!= 'Euro: ' + car.price
-				img(src!='/uploads/' + car.imageLarge)
-				p!= car.color
-			.col-md-8.col-md-offset-2
-				form
-					fieldset.form-group
-						label(for='email')!= 'E-mail'
-						input.form-control#email(type='text' placeholder='naam@email.com')
-					fieldset.form-group
-						label(for='comment')!= 'Comment'
-						textarea.form-control#comment(rows='5' placeholder='Place your comment here...')
-					button.btn.btn-primary(type='submit')!= 'Add comment!'
+		.col-md-8.col-md-offset-2
+			h4!= car.name
+			h6!= 'Euro: ' + car.price
+			img(src!='/uploads/' + car.imageLarge)
+			p!= car.color
+		.col-md-8.col-md-offset-2
+			if comments.length > 0
+				each comment in comments
+					p!= comment.email
+					p!= comment.message
+
+		.col-md-8.col-md-offset-2
+			form(method='POST' action='/comment')
+				fieldset.form-group
+					label(for='email')!= 'E-mail'
+					input.form-control#email(type='text' name='email' placeholder='naam@email.com')
+				fieldset.form-group
+					label(for='comment')!= 'Comment'
+					textarea.form-control#comment(rows='5' name='comment' placeholder='Place your comment here...')
+				input#id(type='hidden' name='id' value!= car._id)
+				button.btn.btn-primary(type='submit')!= 'Add comment!'
 

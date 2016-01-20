@@ -14,20 +14,26 @@ block content
 						th!= 'Comments'
 						th!= 'Edit'
 				tbody
-					each car in cars
+					if cars.length > 0
+						each car in cars
+							tr
+								th(scope='row')!= '#'
+								td
+									img(src!= '/uploads/' + car.imageThumb title!= car.image)
+								td!= car.name
+								td!= car.price
+								td!= car.color
+								td
+									p!= 'Comments '
+										span.label.label-default!= '1'
+								td
+									a(href='/admin/dashboard/edit/' + car._id)!= 'Edit'
+									span!= ' | '
+									a(href='/admin/dashboard/delete/' + car._id)!= 'Delete'
+					else 
 						tr
-							th(scope='row')!= '#'
-							td!= car.image
-							td!= car.name
-							td!= car.price
-							td!= car.color
-							td
-								p!= 'Comments '
-									span.label.label-default!= '1'
-							td
-								a(href='/admin/dashboard/edit/' + car._id)!= 'Edit'
-								span!= ' | '
-								a(href='/admin/dashboard/delete/' + car._id)!= 'Delete'
+							th(scopt='row')!= '#'
+							td!= 'No cars uploaded yet!'
 					
 
 	.row

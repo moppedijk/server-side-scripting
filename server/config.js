@@ -11,7 +11,11 @@ var config = {
 		host: 'localhost',
 		port: '27017',
 		name: 'serverSideScripting'
-	}
+	},
+	credentials: {
+	    username:'admin',
+	    password: '1234'
+    }
 }
 
 module.exports = config;

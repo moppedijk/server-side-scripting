@@ -9,11 +9,6 @@ var config = require('../config'),
     multer = require('multer'),
     im = require('imagemagick'),
     path = require('path'),
-    credentials = {
-    username:'admin',
-    password: '1234'
-    },
-    MongoClient = require('mongodb').MongoClient,
     MongoClient = require('mongodb').MongoClient,
     MongoObjectId = require('mongodb').ObjectID,
     connectionString = 'mongodb://';
@@ -35,11 +30,11 @@ var upload = multer({dest: 'public/uploads/'});
  var auth = function (req, res, next) {
 	// Authentication and Authorization Middleware
 	// Authenticate with user id
- if (req.session.admin && req.session.user === credentials.username) {
-    return next();
-} else {
-    return res.redirect('/admin/');
-}
+    if (req.session.admin && req.session.user === config.credentials.username) {
+        return next();
+    } else {
+        return res.redirect('/admin/');
+    }
 };
 
 /*
@@ -49,7 +44,7 @@ var upload = multer({dest: 'public/uploads/'});
 // Default route
 router.get('/', function (req, res, next){
 
-    if (req.session.admin && req.session.user === credentials.username) {
+    if (req.session.admin && req.session.user === config.credentials.username) {
         res.redirect('admin/dashboard');
     } else {
         res.render('admin/index', {
@@ -63,25 +58,25 @@ router.get('/', function (req, res, next){
     }
 });
 
-// Login endpoint
+// Login router
 router.post('/login', function (req, res) {
- if (!req.body.username || !req.body.password) {
-   res.redirect("admin");
-} else if(req.body.username === credentials.username || req.body.password === credentials.password) {
-  		// Authenticate with user id
-       req.session.user = credentials.username;
-       req.session.admin = true;
-       res.redirect("dashboard");
-   }
+    if (!req.body.username || !req.body.password) {
+        res.redirect("admin");
+    } else if(req.body.username === config.credentials.username || req.body.password === config.credentials.password) {
+        // Authenticate with user id
+        req.session.user = config.credentials.username;
+        req.session.admin = true;
+        res.redirect("dashboard");
+    }
 });
 
-// Logout endpoint
+// Logout router
 router.get('/logout', function (req, res) {
- req.session.destroy();
- res.send("logout success!");
+    req.session.destroy();
+    res.redirect("/admin");
 });
 
-// Get dashboard
+// Dashboard router
 router.get('/dashboard', auth, function (req, res, next) {
     MongoClient.connect(connectionString, function(err, db) {
         if (err) {
@@ -108,6 +103,7 @@ router.get('/dashboard', auth, function (req, res, next) {
 
 });
 
+// Add router
 router.get('/dashboard/add', auth, function (req, res, next) {
     var msg = false;
 
@@ -120,6 +116,7 @@ router.get('/dashboard/add', auth, function (req, res, next) {
     });
 });
 
+// Add new item router
 router.post('/dashboard/add/new', upload.single('image'), auth, function (req, res, next) {
     var isValid = true;
 
@@ -147,12 +144,10 @@ router.post('/dashboard/add/new', upload.single('image'), auth, function (req, r
             if(err) {
                 throw err;
             } else {
-
-                console.log(req.file.path); 
-
                 var parsedName = path.parse(req.file.originalname);
                 var imageSmall = parsedName.name + '-small' + parsedName.ext;
                 var imageLarge = parsedName.name + '-large' + parsedName.ext;
+                var imageThumb = parsedName.name + '-thumb' + parsedName.ext;
 
                 // Small Image
                 im.resize( {
@@ -171,11 +166,21 @@ router.post('/dashboard/add/new', upload.single('image'), auth, function (req, r
                     width: 760
                 }, function(err, stdout, stderr) {
                     if (err) throw err;
-                    
+                });
+
+                // thumb image
+                im.resize( {
+                    srcPath: req.file.destination + req.file.originalname,
+                    dstPath: req.file.destination + imageThumb,
+                    width: 40,
+                    height:40,
+                }, function(err, stdout, stderr) {
+                    if (err) throw err;
                 });
 
                 data.imageSmall = imageSmall;
                 data.imageLarge = imageLarge;
+                data.imageThumb = imageThumb;
                 data.image = req.file.originalname;
             }
         });
@@ -201,16 +206,54 @@ router.post('/dashboard/add/new', upload.single('image'), auth, function (req, r
 
 });
 
-router.get('/dashboard/delete/:id', auth, function (req, res, next) {
+// Edit item router
+router.get('/dashboard/edit/:id', auth, function (req, res, next) {
     var id = req.params.id;
     var o_id = new MongoObjectId(id);
 
+    // Check if mongodb connection is possible
     MongoClient.connect(connectionString, function(err, db) {
         if (err) {
             throw err;
         } else {
-
             // Get cars document
+            db.collection('cars').findOne({"_id" : o_id }, function(err, result) {
+                if (err) {
+                    throw err;
+                } else {
+                    var msg = false;
+
+                    if(req.query.message) {
+                        msg = req.query.message;
+                    }
+
+                    res.render('admin/edit', {
+                        message: msg,
+                        car: result
+                    });
+                };
+            });
+        };
+    });
+});
+
+// Edit item router
+router.post('/dashboard/edit/item', upload.single('image'), auth, function (req, res, next) {
+    
+});
+
+// Delete item router
+router.get('/dashboard/delete/:id', auth, function (req, res, next) {
+    var id = req.params.id;
+    var o_id = new MongoObjectId(id);
+
+    // Check if mongodb connection is possible
+    MongoClient.connect(connectionString, function(err, db) {
+        if (err) {
+            throw err;
+        } else {
+            // Get cars document
+            // Change to findOne();
             db.collection('cars').find({"_id" : o_id }).toArray(function(err, result) {
                 if (err) {
                     throw err;
@@ -225,6 +268,9 @@ router.get('/dashboard/delete/:id', auth, function (req, res, next) {
                     // unlink large image
                     if(result[0].imageLarge)
                         deleteImage(uploadDir + result[0].imageLarge);
+                    // unlink thumb image
+                    if(result[0].imageThumb)
+                        deleteImage(uploadDir + result[0].imageThumb);
 
                     // remove document
                     db.collection('cars').removeOne({"_id": o_id}, function(err, result){
@@ -245,11 +291,8 @@ router.get('/dashboard/delete/:id', auth, function (req, res, next) {
  *	FUNCTION DEFINITIONS
  */
 
-// remove image
+// Remove image
 function deleteImage (imageUrl) {
-    
-    console.log(imageUrl);
-
     fs.unlink(imageUrl, function(err) {
         if (err) throw err;
     });
