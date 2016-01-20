@@ -3,7 +3,7 @@ extends ../_layout/admin.jade
 block content
 	.row
 		.col-md-8
-			form(method='POST' action='/admin/dashboard/add/new/' enctype='multipart/form-data')
+			form(method='POST' action='/admin/dashboard/edit/' enctype='multipart/form-data')
 				fieldset.form-group
 					label(for='name')!= 'Name'
 					input.form-control#name(type='text' value!= car.name name='name' placeholder='e.g. Ferrari')
@@ -20,4 +20,4 @@ block content
 					input.form-control-file#image(type='file' name='image' placeholder='e.g. Red')
 					small.text-muted!= 'Upload an image'
 				input#id(type='hidden' name='id' value!= car._id)
-				button.btn.btn-primary(type='sumbit')!= 'Add new car'
+				button.btn.btn-primary(type='sumbit')!= 'Edit car'

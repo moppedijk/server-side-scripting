@@ -117,6 +117,7 @@ router.get('/dashboard/add', auth, function (req, res, next) {
 });
 
 // Add new item router
+// Rewrite to post /dashboard/add/
 router.post('/dashboard/add/new', upload.single('image'), auth, function (req, res, next) {
     var isValid = true;
 
@@ -238,8 +239,98 @@ router.get('/dashboard/edit/:id', auth, function (req, res, next) {
 });
 
 // Edit item router
-router.post('/dashboard/edit/item', upload.single('image'), auth, function (req, res, next) {
-    
+router.post('/dashboard/edit/', upload.single('image'), auth, function (req, res, next) {
+    var id = req.body.id;
+    var o_id = new MongoObjectId(id);
+    var isValid = true;
+    var data = {};
+
+    if(req.body.name == '')
+        isValid = false
+    if(req.body.price == '')
+        isValid = false
+    if(req.body.color == '')
+        isValid = false
+
+    if(isValid) {
+
+        if(!req.file == undefined) {
+            /*
+             *  If file is not empty
+             *  Delete old files
+             *  Upload new files
+             */
+            // fs.rename(req.file.path, req.file.destination + req.file.originalname, function(err) {
+            //     if(err) {
+            //         throw err;
+            //     } else {
+            //         var parsedName = path.parse(req.file.originalname);
+            //         var imageSmall = parsedName.name + '-small' + parsedName.ext;
+            //         var imageLarge = parsedName.name + '-large' + parsedName.ext;
+            //         var imageThumb = parsedName.name + '-thumb' + parsedName.ext;
+
+            //         // Small Image
+            //         im.resize( {
+            //             srcPath: req.file.destination + req.file.originalname,
+            //             dstPath: req.file.destination + imageSmall,
+            //             width: 350,
+            //             height: 350, 
+            //         }, function(err, stdout, stderr) {
+            //             if (err) throw err;
+            //         });
+
+            //         // large image
+            //         im.resize( {
+            //             srcPath: req.file.destination + req.file.originalname,
+            //             dstPath: req.file.destination + imageLarge,
+            //             width: 760
+            //         }, function(err, stdout, stderr) {
+            //             if (err) throw err;
+            //         });
+
+            //         // thumb image
+            //         im.resize( {
+            //             srcPath: req.file.destination + req.file.originalname,
+            //             dstPath: req.file.destination + imageThumb,
+            //             width: 40,
+            //             height:40,
+            //         }, function(err, stdout, stderr) {
+            //             if (err) throw err;
+            //         });
+
+            //         data.imageSmall = imageSmall;
+            //         data.imageLarge = imageLarge;
+            //         data.imageThumb = imageThumb;
+            //         data.image = req.file.originalname;
+            //     }
+            // });
+        };
+
+        data.name = req.body.name;
+        data.price = req.body.price;
+        data.color = req.body.color;
+
+        MongoClient.connect(connectionString, function(err, db) {
+            if (err) {
+                throw err;
+            } else {
+
+                db.collection('cars').update(
+                    {"_id": o_id}, 
+                    {$set: data},
+                    function(err, result){
+                        if(err) {
+                            throw err;
+                        } else {
+                            res.redirect('/admin/dashboard/?message=' + 'Car with id: ' + req.body.id + ' edited!');
+                        }
+                });
+            }
+        });
+
+    } else {
+        res.redirect('/admin/dashboard/edit/?message=' + 'Please fillin the form');
+    }
 });
 
 // Delete item router
@@ -271,6 +362,8 @@ router.get('/dashboard/delete/:id', auth, function (req, res, next) {
                     // unlink thumb image
                     if(result[0].imageThumb)
                         deleteImage(uploadDir + result[0].imageThumb);
+
+                    // Remove all comments corresponding document
 
                     // remove document
                     db.collection('cars').removeOne({"_id": o_id}, function(err, result){
