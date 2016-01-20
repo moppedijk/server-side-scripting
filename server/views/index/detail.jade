@@ -3,24 +3,29 @@ extends ../_layout/default.jade
 block content
 	.row
 		.col-md-8.col-md-offset-2
-			h4!= car.name
-			h6!= 'Euro: ' + car.price
-			img(src!='/uploads/' + car.imageLarge)
-			p!= car.color
-		.col-md-8.col-md-offset-2
-			if comments.length > 0
-				each comment in comments
-					p!= comment.email
-					p!= comment.message
-
-		.col-md-8.col-md-offset-2
-			form(method='POST' action='/comment')
-				fieldset.form-group
-					label(for='email')!= 'E-mail'
-					input.form-control#email(type='text' name='email' placeholder='naam@email.com')
-				fieldset.form-group
-					label(for='comment')!= 'Comment'
-					textarea.form-control#comment(rows='5' name='comment' placeholder='Place your comment here...')
-				input#id(type='hidden' name='id' value!= car._id)
-				button.btn.btn-primary(type='submit')!= 'Add comment!'
+			.card
+				.card-img
+					img.card-img-top(src!='/uploads/' + car.imageLarge alt!=car.name)
+				.card-block
+					h4.card-title!= car.name
+					p.card-text!= 'Euro: ' + car.price
+					p.card-text!= 'Color: ' + car.color
+				ul.list-group.list-group-flush
+					if comments.length > 0
+						each comment in comments
+							li.list-group-item 
+								strong!= comment.email + ': '
+								span!= comment.comment
+					else
+						li.list-group-item!= 'No comments'
+				.card-block
+					form(method='POST' action='/comment')
+						fieldset.form-group
+							label(for='email')!= 'E-mail'
+							input.form-control#email(type='text' name='email' placeholder='naam@email.com')
+						fieldset.form-group
+							label(for='comment')!= 'Comment'
+							textarea.form-control#comment(rows='5' name='comment' placeholder='Place your comment here...')
+						input#id(type='hidden' name='id' value!= car._id)
+						button.btn.btn-primary(type='submit')!= 'Add comment!'
 
