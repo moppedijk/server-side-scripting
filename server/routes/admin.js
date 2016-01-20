@@ -2,24 +2,24 @@
  *	ROUTER VARIABLES
  */
 
-var config = require('../config'),
-    fs = require('fs'),
-    express = require('express'),
-    router = express.Router(),
-    multer = require('multer'),
-    im = require('imagemagick'),
-    path = require('path'),
-    MongoClient = require('mongodb').MongoClient,
-    MongoObjectId = require('mongodb').ObjectID,
-    connectionString = 'mongodb://';
-    connectionString += config.database.host;
-    connectionString += ':';
-    connectionString += config.database.port;
-    connectionString += '/';
-    connectionString += config.database.name;
+// var config = require('../config'),
+//     fs = require('fs'),
+//     express = require('express'),
+//     router = express.Router(),
+//     multer = require('multer'),
+//     im = require('imagemagick'),
+//     path = require('path'),
+//     MongoClient = require('mongodb').MongoClient,
+//     MongoObjectId = require('mongodb').ObjectID,
+//     connectionString = 'mongodb://';
+//     connectionString += config.database.host;
+//     connectionString += ':';
+//     connectionString += config.database.port;
+//     connectionString += '/';
+//     connectionString += config.database.name;
 
 // Define upload dir
-var upload = multer({dest: 'public/uploads/'});
+// var upload = multer({dest: 'public/uploads/'});
 
 /*
  *	AUTHENTICATION
@@ -27,184 +27,55 @@ var upload = multer({dest: 'public/uploads/'});
  *	https://orchestrate.io/blog/2014/06/26/build-user-authentication-with-node-js-express-passport-and-orchestrate/
  */
 
- var auth = function (req, res, next) {
-	// Authentication and Authorization Middleware
-	// Authenticate with user id
-    if (req.session.admin && req.session.user === config.credentials.username) {
-        return next();
-    } else {
-        return res.redirect('/admin/');
-    }
-};
+//  var auth = function (req, res, next) {
+// 	// Authentication and Authorization Middleware
+//     if (req.session.admin && req.session.user === config.credentials.username) {
+//         return next();
+//     } else {
+//         return res.redirect('/admin/');
+//     }
+// };
 
 /*
  *	ROUTER DEFINITIONS
  */
 
-// Default route
-router.get('/', function (req, res, next){
+var indexRouter = require('./admin/index');
+// var loginRouter = require('./admin/login');
+// var logoutRouter = require('./admin/logout');
+// var dashboardRouter = require('./admin/dashboard');
+// var addRouter = require('./admin/add');
+// var addNewRouter = require('./admin/addNew');
 
-    if (req.session.admin && req.session.user === config.credentials.username) {
-        res.redirect('admin/dashboard');
-    } else {
-        res.render('admin/index', {
-            title: 'Admin',
-            headerTitle: 'SSS - Admin',
-            menuItems: [
-            {title: 'Home', hash: '/'}, 
-            {title: 'Auto\'s', hash: 'cars'},
-            ]
-        });
-    }
+ // Default route
+router.get('/', function (req, res, next){
+    indexRouter.init(req, res, next);
 });
 
 // Login router
-router.post('/login', function (req, res) {
-    if (!req.body.username || !req.body.password) {
-        res.redirect("admin");
-    } else if(req.body.username === config.credentials.username || req.body.password === config.credentials.password) {
-        // Authenticate with user id
-        req.session.user = config.credentials.username;
-        req.session.admin = true;
-        res.redirect("dashboard");
-    }
-});
+// router.post('/login', function (req, res, next) {
+//     loginRouter.init(req, res, next);
+// });
 
-// Logout router
-router.get('/logout', function (req, res) {
-    req.session.destroy();
-    res.redirect("/admin");
-});
+// // Logout router
+// router.get('/logout', function (req, res, next) {
+//     logoutRouter.init(req, res, next);
+// });
 
-// Dashboard router
-router.get('/dashboard', auth, function (req, res, next) {
-    MongoClient.connect(connectionString, function(err, db) {
-        if (err) {
-            throw err;
-        } else {
-            db.collection('cars').find().toArray(function(err, result) {
-                if (err) {
-                    throw err;
-                } else {
-                    var msg = false;
+// // Dashboard router
+// router.get('/dashboard', auth, function (req, res, next) {
+//     dashboardRouter.init(req, res, next);
+// });
 
-                    if(req.query.message) {
-                        msg = req.query.message;
-                    }
-
-                    res.render('admin/dashboard', {
-                        message: msg,
-                        cars: result
-                    });
-                }
-            });
-        }
-    });
-
-});
-
-// Add router
-router.get('/dashboard/add', auth, function (req, res, next) {
-    var msg = false;
-
-    if(req.query.message) {
-        msg = req.query.message;
-    }
-
-    res.render('admin/add', {
-        message: msg
-    });
-});
+// // Add router
+// router.get('/dashboard/add', auth, function (req, res, next) {
+//     addRouter.init(req, res, next);
+// });
 
 // Add new item router
-router.post('/dashboard/add/new', upload.single('image'), auth, function (req, res, next) {
-    var isValid = true;
-
-    if(req.body.name == '')
-        isValid = false
-    if(req.body.price == '')
-        isValid = false
-    if(req.body.color == '')
-        isValid = false
-    if(req.file == undefined)
-        isValid = false
-
-    if(isValid) {
-
-        var data = {
-            name: req.body.name,
-            price: req.body.price,
-            color: req.body.color,
-        }
-
-        /*
-         *  How does this work?
-         */
-        fs.rename(req.file.path, req.file.destination + req.file.originalname, function(err) {
-            if(err) {
-                throw err;
-            } else {
-                var parsedName = path.parse(req.file.originalname);
-                var imageSmall = parsedName.name + '-small' + parsedName.ext;
-                var imageLarge = parsedName.name + '-large' + parsedName.ext;
-                var imageThumb = parsedName.name + '-thumb' + parsedName.ext;
-
-                // Small Image
-                im.resize( {
-                    srcPath: req.file.destination + req.file.originalname,
-                    dstPath: req.file.destination + imageSmall,
-                    width: 350,
-                    height: 350, 
-                }, function(err, stdout, stderr) {
-                    if (err) throw err;
-                });
-
-                // large image
-                im.resize( {
-                    srcPath: req.file.destination + req.file.originalname,
-                    dstPath: req.file.destination + imageLarge,
-                    width: 760
-                }, function(err, stdout, stderr) {
-                    if (err) throw err;
-                });
-
-                // thumb image
-                im.resize( {
-                    srcPath: req.file.destination + req.file.originalname,
-                    dstPath: req.file.destination + imageThumb,
-                    width: 40,
-                    height:40,
-                }, function(err, stdout, stderr) {
-                    if (err) throw err;
-                });
-
-                data.imageSmall = imageSmall;
-                data.imageLarge = imageLarge;
-                data.imageThumb = imageThumb;
-                data.image = req.file.originalname;
-            }
-        });
-
-        MongoClient.connect(connectionString, function(err, db) {
-            if (err) {
-                throw err;
-            } else {
-
-                db.collection('cars').insertOne(data, function(err, result){
-                    if(err) {
-                        throw err;
-                    } else {
-                        res.redirect('/admin/dashboard/?message=' + 'New car added!');
-                    }
-                });
-            }
-        });
-
-    } else {
-        res.redirect('/admin/dashboard/add/?message=' + 'Please fillin the form');
-    }
-
-});
+// router.post('/dashboard/add/new', upload.single('image'), auth, function (req, res, next) {
+//     addNewRouter.init(req, res, next);
+// });
 
 // Edit item router
 router.get('/dashboard/edit/:id', auth, function (req, res, next) {
